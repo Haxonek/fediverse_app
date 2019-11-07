@@ -1,13 +1,9 @@
 // Modules to control application life and create native browser window
-// const {app, BrowserWindow} = require('electron')
 const electron = require("electron");
 const path = require('path')
-// const url = require('url')
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
-// const app = require('app');
-// const BrowserWindow = require('browser-window')
 const ipc = electron.ipcMain
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -17,14 +13,13 @@ let mainWindow
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
+    width: 900,
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true
     }
   })
-  // mainWindow.loadURL('http://gab.com')
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
@@ -42,11 +37,17 @@ function createWindow () {
   })
 }
 
-ipc.on('connect-to-instance', function(event, arg) {
-    console.log('Button click')
+// set up web instance
+ipc.on('connect-to-instance', function(event, instanceURL) {
+    console.log(instanceURL)
     mainWindow.close() // there must be a better way to do this lol
     mainWindow = new BrowserWindow()
-    mainWindow.loadURL('http://google.com')
+
+    if (instanceURL.includes('http:') || instanceURL.includes('https:')) {
+        mainWindow.loadURL(instanceURL)
+    } else {
+        mainWindow.loadURL("https://" + instanceURL)
+    }
 })
 
 // This method will be called when Electron has finished
