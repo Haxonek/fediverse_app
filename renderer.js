@@ -4,3 +4,12 @@
 // `nodeIntegration` is turned off. Use `preload.js` to
 // selectively enable features needed in the rendering
 // process.
+
+
+const ipc = require('electron').ipcRenderer;
+
+const connect = document.getElementById('connect-button')
+
+connect.addEventListener('click', function(){
+    ipc.send('connect-to-instance', 'arg');
+})
