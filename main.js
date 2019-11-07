@@ -5,10 +5,12 @@ const path = require('path')
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain
+const Menu = electron.Menu
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+let menu
 
 function createWindow () {
   // Create the browser window.
@@ -23,7 +25,6 @@ function createWindow () {
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
-  console.log("Good morning!")
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -35,10 +36,44 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+
+  // add menu
+  menu = Menu.buildFromTemplate([
+      {
+          label: 'Instances',
+          submenu: [
+              {label:'Home', click() {mainWindow.loadFile('index.html')}},
+              {type:'separator'},
+              {label:'Mastodon', click() {rebuildWindow('https://mastodon.social/')}},
+              {label:'Pawoo', click() {rebuildWindow('https://pawoo.net/')}},
+              {label:'Mstdn', click() {rebuildWindow('https://mastdn.social/')}},
+              {label:'Socialhome', click() {rebuildWindow('https://socialhome.network/')}},
+              {label:'Pixelfed', click() {rebuildWindow('https://pixelfed.org/')}},
+              {label:'Gab', click() {rebuildWindow('https://gab.com/')}},
+              {type:'separator'},
+              {
+                  label:'Quit',
+                  click() {
+                      app.quit()
+                  }
+              }
+          ]
+      }
+  ])
+  Menu.setApplicationMenu(menu);
 }
 
 // set up web instance
 ipc.on('connect-to-instance', function(event, instanceURL) {
+    if (instanceURL.includes('http:') || instanceURL.includes('https:')) {
+        rebuildWindow(instanceURL)
+    } else {
+        rebuildWindow("https://" + instanceURL)
+    }
+})
+
+// replace window with instance
+function rebuildWindow(instanceURL) {
     console.log(instanceURL)
     mainWindow.close() // there must be a better way to do this lol
     mainWindow = new BrowserWindow({
@@ -49,12 +84,8 @@ ipc.on('connect-to-instance', function(event, instanceURL) {
       }
     })
 
-    if (instanceURL.includes('http:') || instanceURL.includes('https:')) {
-        mainWindow.loadURL(instanceURL)
-    } else {
-        mainWindow.loadURL("https://" + instanceURL)
-    }
-})
+    mainWindow.loadURL(instanceURL)
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
