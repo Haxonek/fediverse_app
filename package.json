@@ -1,5 +1,5 @@
 {
-  "name": "Fediverse Desktop App",
+  "name": "fediverse-desktop-app",
   "version": "0.0.1",
   "description": "A simple desktop client that loads instances of the fediverse.",
   "main": "main.js",

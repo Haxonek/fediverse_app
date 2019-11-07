@@ -41,7 +41,13 @@ function createWindow () {
 ipc.on('connect-to-instance', function(event, instanceURL) {
     console.log(instanceURL)
     mainWindow.close() // there must be a better way to do this lol
-    mainWindow = new BrowserWindow()
+    mainWindow = new BrowserWindow({
+      width: 900,
+      height: 600,
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js')
+      }
+    })
 
     if (instanceURL.includes('http:') || instanceURL.includes('https:')) {
         mainWindow.loadURL(instanceURL)
